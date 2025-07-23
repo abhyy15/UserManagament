@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use App\Models\Role;
+use Illuminate\Support\Facades\Redis;
 
 class UserController extends BaseController
 {
@@ -22,7 +22,22 @@ class UserController extends BaseController
         }
 
         if ($user->role->name === 'SuperAdmin') {
-            return $this->sendResponse(User::withTrashed()->with('role')->get());
+
+
+            if (Redis::exists('employee_list')) {
+                $cached = Redis::get('employee_list');
+                $getDataFromRedis = json_decode($cached, true);
+                return $this->sendResponse($getDataFromRedis);
+            }
+        
+        
+            $users = User::withoutTrashed()->with('role')->get();
+            Redis::set('employee_list', json_encode($users));
+        
+            return $this->sendResponse($users);
+
+
+            // return $this->sendResponse(User::withTrashed()->with('role')->get());
         }
     
         if ($user->role->name === 'Admin') {
@@ -38,9 +53,13 @@ class UserController extends BaseController
     public function update(Request $request, $id)
     {
         $authUser = auth()->user();
-        $userToUpdate = User::findOrFail($id);
+        $userToUpdate = User::find($id);
         // dd($authUser->id , $userToUpdate->id);
         // $authUser->id === $userToUpdate->id 
+
+        if (!$userToUpdate) {
+            return $this->sendError('User not found', 403);
+        }
 
         //if user want to update
         if ($authUser->role->name === 'User') {
@@ -71,6 +90,9 @@ class UserController extends BaseController
         $input = $request->only(['name', 'email', 'password', 'role_id']);
         $userToUpdate->update($input);
 
+        Redis::del('employee_list');
+
+
         return $this->sendResponse($userToUpdate, 'User updated successfully');
 
 
@@ -78,12 +100,6 @@ class UserController extends BaseController
         //     return response()->json(['error' => 'Unauthorized'], 403);
         // }
 
-        // $authRole = $authUser->role->name;
-
-        // // Only superadmin or the same user can update
-        // if ($authRole !== 'superadmin' && $authUser->id !== $userToUpdate->id) {
-        //     return response()->json(['error' => 'Permission denied'], 403);
-        // }
     }
 
     public function destroy($id)
@@ -110,6 +126,7 @@ class UserController extends BaseController
             }
     
             $user->delete();
+            Redis::del('employee_list');
             return $this->sendResponse([], 'User soft-deleted successfully');
         } 
 

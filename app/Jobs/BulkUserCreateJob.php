@@ -23,13 +23,13 @@ class BulkUserCreateJob implements ShouldQueue
 
     public function handle()
     {
-        \Log::info('Running job for user: ' . $this->userData['email']);
+        // \Log::info('Running job for user: ' . $this->userData['email']);
 
 
-        User::updateOrCreate(
-            ['email' => $this->userData['email']],
+        User::Create(
             [
                 'name'     => $this->userData['name'],
+                'email' => $this->userData['email'],
                 'password' => $this->userData['password'],
                 'role_id'  => $this->userData['role_id'],
             ]
