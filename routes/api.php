@@ -16,10 +16,8 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 
+//pls run migration file and after seeder file then test url 
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
