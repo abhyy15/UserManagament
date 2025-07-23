@@ -23,6 +23,7 @@ class UserController extends BaseController
 
         if ($user->role->name === 'SuperAdmin') {
 
+            // Redis::del('employee_list');
 
             if (Redis::exists('employee_list')) {
                 $cached = Redis::get('employee_list');
@@ -31,7 +32,7 @@ class UserController extends BaseController
             }
         
         
-            $users = User::withoutTrashed()->with('role')->get();
+            $users = User::withTrashed()->with('role')->get();
             Redis::set('employee_list', json_encode($users));
         
             return $this->sendResponse($users);
