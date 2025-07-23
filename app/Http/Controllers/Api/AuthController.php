@@ -63,6 +63,17 @@ class AuthController extends BaseController
     {
         $users = $request->input('users');
 
+        // {
+        //     "users": [
+        //       {
+        //         "name": "Alice Johnson",
+        //         "email": "alice1@example.com",
+        //         "password": "password123",
+        //         "role_id": 2
+        //       },
+        //         ]
+        // }
+
         if (!is_array($users)) {
             return $this->sendError('Users should be an array of user data', 422);
         }

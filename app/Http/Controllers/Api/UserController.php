@@ -93,13 +93,7 @@ class UserController extends BaseController
 
         Redis::del('employee_list');
 
-
         return $this->sendResponse($userToUpdate, 'User updated successfully');
-
-
-        // if (!$authUser || !$authUser->role) {
-        //     return response()->json(['error' => 'Unauthorized'], 403);
-        // }
 
     }
 
