@@ -16,9 +16,9 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -34,6 +34,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/users/restore/{id}', [UserController::class, 'restore']);
 });
 
-Route::middleware('auth:api')->get('/me', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/me', function (Request $request) {
+//     return $request->user();
+// });
