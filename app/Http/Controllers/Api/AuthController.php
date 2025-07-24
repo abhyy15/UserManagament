@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Jobs\BulkUserCreateJob;
+use App\Mail\UserRegisteredMail;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends BaseController
 {
@@ -27,6 +29,11 @@ class AuthController extends BaseController
         $input = $request->all();
 
         $user = User::create($input);
+
+        // Dispatch email to queue
+        // Mail::to($user->email)->queue(new UserRegisteredMail($user));
+        Mail::to($user->email)->later(now()->addSeconds(10), new UserRegisteredMail($user));
+
         $token = $user->createToken('UserToken')->accessToken;
 
         return $this->sendResponse(['token' => $token, 'user' => $user], 'User registered successfully');
